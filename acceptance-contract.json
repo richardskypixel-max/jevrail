@@ -32,5 +32,5 @@
     "preserve original response and observed usage without invented interpretation",
     "private output permissions and no credentials in artifacts"
   ],
-  "live_test_policy": "Optional and billable. Freeze these expectations before a live run; do not run in CI. Public translated examples have not been live-tested."
+  "live_test_policy": "Optional and billable. Freeze these expectations before a live run; do not run in CI. On 2026-09-26, only the public completed case was live-tested against these unchanged thresholds. The other two translated cases remain untested live; see docs/VALIDATION.md."
 }
