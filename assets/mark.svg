@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" role="img" aria-label="JevRail mark">
+  <rect x="1" y="1" width="126" height="126" rx="28" fill="#101c2b" stroke="#304258"/>
+  <g fill="none" stroke="#5ee7d5" stroke-width="7" stroke-linecap="round">
+    <path d="M26 89H48Q62 89 62 75V45Q62 31 77 31H103"/>
+    <path d="M26 106H65Q79 106 79 92V62Q79 48 94 48H103"/>
+  </g>
+  <circle cx="62" cy="60" r="5" fill="#f5f9ff"/>
+</svg>
