@@ -1,2 +1,126 @@
-# jevrail
-Auditable Jev decisions through OpenRouter. A macOS-first TypeScript CLI with Keychain credentials, recorded costs, and conservative retries.
+<p align="center"><img src="assets/banner.svg" alt="JevRail — Every decision leaves a receipt." width="100%"></p>
+
+<p align="center"><strong>Every decision leaves a receipt.</strong><br>Inspectable Jev calls. Recorded costs. Conservative retries.</p>
+
+<p align="center">English · <a href="README.zh-CN.md">简体中文</a><br>macOS first · TypeScript + Node.js · Zero runtime npm dependencies · MIT · Alpha</p>
+
+JevRail is a small CLI for calling **Jev through OpenRouter**. It keeps the request, original response, model ID, cost and hashes together, so a script or coding agent can show what actually happened.
+
+You bring an OpenRouter key. JevRail reads it from macOS Keychain and calls OpenRouter directly. There is no project-operated relay, background server, account, telemetry or third-party runtime SDK.
+
+This is an independent community client, not an official OpenRouter or TypeSafe product. Currently it supports Jev's typed decisions only, not general chat or media processing.
+
+## Why this exists
+
+Small AI jobs should be easy to inspect. Before trusting a batch, you should be able to answer:
+
+- Where does the key go?
+- What did the model receive and return?
+- What was the reported cost?
+- If the connection breaks, could a retry charge again?
+
+JevRail makes those questions visible in source and local records. It does not claim that another tool is malicious or that a model's answer is true.
+
+## Try it without a key
+
+Download or clone this repository, then enter its directory. Use **Node.js 22.18+ within the 22.x line, or Node.js 24+**. Live credentials currently require macOS.
+
+```sh
+chmod +x ./jevrail
+./jevrail --version
+./jevrail plan examples/smoke-job.json
+```
+
+`plan` validates three synthetic examples locally. It does not read credentials, contact a provider or incur charges. No `npm install` or build step is needed to run the CLI.
+
+## Make a small live call
+
+1. Run `./jevrail keychain-info` to see the expected **service and account selectors**. This does not access the secret.
+2. In macOS Keychain Access, create a generic password using item name `jevrail.openrouter`, the displayed account, and your OpenRouter key as the password. Keep the key out of shell commands and job files.
+3. Use an ordinary API key with a spending limit. Start with one synthetic item:
+
+```sh
+./jevrail key-status
+./jevrail run examples/smoke-job.json --out runs/first-try \
+  --max-items 1 --max-attempts 1 --budget-usd 0.01 --reserve-usd 0.002
+
+# Resume the other two items using the same manifest and policy.
+./jevrail run examples/smoke-job.json --out runs/first-try \
+  --max-attempts 1 --budget-usd 0.01 --reserve-usd 0.002
+
+# Read the saved summary offline.
+./jevrail status runs/first-try
+```
+
+These `run` commands are **billable**. The `$0.01` value is a local scheduling budget, not a provider-enforced per-request cap. Actual pricing can change. When a response exceeds its reservation, the client records it and stops additional work. Keep a provider-side key limit as well.
+
+An existing Keychain item can be selected with `--keychain-service NAME --keychain-account ACCOUNT`. These options accept identifiers, never the key itself. The CLI does not modify Keychain or discover other credentials automatically.
+
+## What is built in
+
+| Capability | Behavior |
+|---|---|
+| Typed decisions | Validates `noul`, `choice`, `score`, question IDs, ranges, model, provider and usage. |
+| Fixed destination | HTTPS to OpenRouter only; redirects rejected; ambient proxy and Node injection settings cleared by the launcher. |
+| Conservative accounting | Reserve before dispatch; bounded concurrency; unknown costs retain reservations. |
+| Resume | Check completed raw-response hashes; skip completed items without more decision calls. |
+| Uncertain outcomes | Stop on timeout, interruption or invalid response. Do not automatically resend. |
+| Rate limits | Only HTTP 429 can retry once; disable retries with `--max-attempts 1`. |
+| Local receipts | Save exact response bytes separately from parsed results and interpretation. |
+| Input guardrails | Block obvious secrets, contact details, URLs and common private paths. Business text requires explicit opt-in. |
+
+```text
+Your script / coding agent
+          │
+          ▼
+      JevRail CLI ───── read credential ───── macOS Keychain
+          │
+          ├──── validate → reserve → persist
+          │
+          └──── HTTPS ──── OpenRouter ──── TypeSafe / Jev
+          │
+          ▼
+   Private local receipts
+   request · raw response · usage · hashes
+```
+
+The request body is sent to OpenRouter and its model provider. Original requests and results remain in the local output directory. Input filters are not a complete anonymizer; hashes are not signatures or proof of model accuracy. See [security boundaries](SECURITY.md).
+
+## Receipts
+
+```text
+runs/first-try/
+├── job.json
+├── ledger.json
+├── summary.json
+└── <item-fingerprint>/attempt-1/
+    ├── request.json
+    ├── response.raw.json
+    └── result.json
+```
+
+Output directories use mode `700`; files use `600`. `interpretation` is left empty so downstream commentary cannot be confused with a provider result. Runs are ignored by Git. Do not publish private receipts.
+
+## Development
+
+```sh
+chmod +x ./jevrail
+npm ci --ignore-scripts
+npm run check
+```
+
+Development dependencies are locked. Tests use synthetic transports; CI needs no API secrets and makes no paid calls. Node's built-in TypeScript execution does not type-check; the check command runs TypeScript separately.
+
+This is an **alpha**. An earlier local version passed three live synthetic cases and a cache replay; this public version adds portable setup and English examples, which have not been live-tested. See [validation scope](docs/VALIDATION.md).
+
+## Learn more
+
+- [CLI and job format](docs/USAGE.md)
+- [Use with Codex or another coding agent](docs/CODEX.md)
+- [Architecture and failure behavior](docs/ARCHITECTURE.md)
+- [Security policy](SECURITY.md) · [Contributing](CONTRIBUTING.md) · [Roadmap](docs/ROADMAP.md)
+- [OpenRouter's Jev documentation](https://openrouter.ai/docs/guides/community/jev-tutorial)
+
+## License
+
+[MIT](LICENSE). OpenRouter and TypeSafe names identify compatible services; their service terms and model access are separate from this code's license.

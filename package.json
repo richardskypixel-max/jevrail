@@ -1,0 +1,22 @@
+{
+  "name": "jevrail",
+  "version": "0.1.0-alpha.1",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "^22.18.0 || >=24.0.0"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.ts",
+    "typecheck": "tsc --noEmit",
+    "plan": "./jevrail plan examples/smoke-job.json",
+    "check:release": "node scripts/check-release.ts",
+    "check": "npm run typecheck && npm test && npm run check:release"
+  },
+  "devDependencies": {
+    "@types/node": "22.19.17",
+    "typescript": "5.9.3"
+  },
+  "description": "Auditable Jev decisions through OpenRouter, with local receipts and conservative retry controls.",
+  "license": "MIT"
+}

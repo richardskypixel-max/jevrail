@@ -1,0 +1,15 @@
+node_modules/
+runs/
+verification/
+migration_backup/
+dist/
+coverage/
+.env
+.env.*
+*.key
+*.pem
+*.p12
+*.log
+.DS_Store
+.codex/
+.agents/

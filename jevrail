@@ -1,0 +1,8 @@
+#!/bin/sh
+set -eu
+# Keep startup injection, inherited credentials and ambient proxies out of the client.
+unset NODE_OPTIONS NODE_EXTRA_CA_CERTS NODE_TLS_REJECT_UNAUTHORIZED NODE_USE_ENV_PROXY
+unset HTTP_PROXY HTTPS_PROXY ALL_PROXY http_proxy https_proxy all_proxy
+unset OPENROUTER_API_KEY TYPESAFE_API_KEY TYPESAFE_BASE_URL
+app_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+exec node "$app_dir/src/cli.ts" "$@"

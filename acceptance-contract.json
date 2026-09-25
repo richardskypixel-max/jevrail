@@ -1,0 +1,36 @@
+{
+  "scope": "Synthetic API and typed-result acceptance only; not actual media scoring or creative acceptance",
+  "max_live_items": 3,
+  "budget_usd": "0.01",
+  "per_request_reservation_usd": "0.002",
+  "semantic_checks": {
+    "completed": {
+      "stage": "complete",
+      "verified_complete_min": 0.8,
+      "completion_level_min": 3.5
+    },
+    "failed": {
+      "stage": "failed",
+      "verified_complete_max": 0.2,
+      "completion_level_max": 0.5
+    },
+    "running": {
+      "stage": "running",
+      "completion_level_min": 0.5,
+      "completion_level_max": 1.5
+    }
+  },
+  "offline_requirements": [
+    "block secret-like input, media URLs and local paths",
+    "fixed model and destination with no redirect or ambient proxy",
+    "persist budget reservation before sending",
+    "single writer and explicit limited concurrency",
+    "bounded 429 retry; never resend an uncertain request",
+    "resume completed items without new paid requests",
+    "reject changed manifest and modified cached response",
+    "validate typed answers, provider, exact model, probabilities and cost",
+    "preserve original response and observed usage without invented interpretation",
+    "private output permissions and no credentials in artifacts"
+  ],
+  "live_test_policy": "Optional and billable. Freeze these expectations before a live run; do not run in CI. Public translated examples have not been live-tested."
+}
