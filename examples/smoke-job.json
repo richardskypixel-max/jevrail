@@ -1,0 +1,107 @@
+{
+  "schema_version": "jev-direct-job/1",
+  "standard_version": "synthetic-connectivity-1",
+  "data_class": "synthetic",
+  "model": "typesafe/jev-1.13-20260917",
+  "items": [
+    {
+      "id": "completed",
+      "state": {
+        "test_log": "Synthetic log: the task completed, output was produced, verification passed, and no errors remain.",
+        "contains_real_project_data": false
+      },
+      "questions": {
+        "verified_complete": {
+          "type": "noul",
+          "instructions": "Does the log explicitly confirm that the task completed, verification passed, and no errors remain? All three conditions are required."
+        },
+        "stage": {
+          "type": "choice",
+          "instructions": "Which task state does the log explicitly record?",
+          "criteria": {
+            "complete": "Completed, verification passed, no unresolved errors",
+            "failed": "Failed or stopped with unresolved errors",
+            "running": "Still running and not complete"
+          }
+        },
+        "completion_level": {
+          "type": "score",
+          "instructions": "Assess the explicitly recorded completion state.",
+          "criteria": [
+            "Failed or stopped; output incomplete",
+            "Still running; incomplete",
+            "Completed but not yet verified",
+            "Completed and verified, but errors remain",
+            "Completed and verified; no errors remain"
+          ]
+        }
+      }
+    },
+    {
+      "id": "failed",
+      "state": {
+        "test_log": "Synthetic log: the task failed and stopped, output is incomplete, verification failed, and errors remain.",
+        "contains_real_project_data": false
+      },
+      "questions": {
+        "verified_complete": {
+          "type": "noul",
+          "instructions": "Does the log explicitly confirm that the task completed, verification passed, and no errors remain? All three conditions are required."
+        },
+        "stage": {
+          "type": "choice",
+          "instructions": "Which task state does the log explicitly record?",
+          "criteria": {
+            "complete": "Completed, verification passed, no unresolved errors",
+            "failed": "Failed or stopped with unresolved errors",
+            "running": "Still running and not complete"
+          }
+        },
+        "completion_level": {
+          "type": "score",
+          "instructions": "Assess the explicitly recorded completion state.",
+          "criteria": [
+            "Failed or stopped; output incomplete",
+            "Still running; incomplete",
+            "Completed but not yet verified",
+            "Completed and verified, but errors remain",
+            "Completed and verified; no errors remain"
+          ]
+        }
+      }
+    },
+    {
+      "id": "running",
+      "state": {
+        "test_log": "Synthetic log: the task is still running, not complete, there is no output yet, and verification has not started.",
+        "contains_real_project_data": false
+      },
+      "questions": {
+        "verified_complete": {
+          "type": "noul",
+          "instructions": "Does the log explicitly confirm that the task completed, verification passed, and no errors remain? All three conditions are required."
+        },
+        "stage": {
+          "type": "choice",
+          "instructions": "Which task state does the log explicitly record?",
+          "criteria": {
+            "complete": "Completed, verification passed, no unresolved errors",
+            "failed": "Failed or stopped with unresolved errors",
+            "running": "Still running and not complete"
+          }
+        },
+        "completion_level": {
+          "type": "score",
+          "instructions": "Assess the explicitly recorded completion state.",
+          "criteria": [
+            "Failed or stopped; output incomplete",
+            "Still running; incomplete",
+            "Completed but not yet verified",
+            "Completed and verified, but errors remain",
+            "Completed and verified; no errors remain"
+          ]
+        }
+      }
+    }
+  ]
+}
