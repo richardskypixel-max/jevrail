@@ -1,6 +1,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createHash } from 'node:crypto';
 
 // An intentionally small publication guard, not a complete DLP scanner.
 // Uses a source-tree allowlist so ignored private files cannot silently ship.
@@ -10,6 +11,11 @@ const allowed = new Set(['src', 'tests', 'scripts', 'examples', 'docs', 'assets'
   'README.zh-CN.md', 'LICENSE', 'SECURITY.md', 'CONTRIBUTING.md', 'AGENTS.md', 'CHANGELOG.md',
   '.gitignore', '.gitattributes', '.editorconfig']);
 const ignored = new Set(['node_modules', '.git']);
+// This exact terminal-only GIF was reviewed together with its text recording.
+// New or changed binary assets require another explicit review and digest update.
+const reviewedBinary = new Map([
+  ['assets/demo.gif', 'b0a332dda16736f1f79a50263a413216cdbc07888cf92f2adb5204fa6c80acbf'],
+]);
 const findings: string[] = [];
 const files: string[] = [];
 function walk(dir: string): void {
@@ -22,6 +28,14 @@ function walk(dir: string): void {
     if (stat.isDirectory()) { walk(file); continue; }
     if (!stat.isFile() || stat.size > 1024 * 1024) { findings.push('Unexpected file type or size: ' + rel); continue; }
     files.push(rel);
+    if (reviewedBinary.has(rel)) {
+      const bytes = fs.readFileSync(file);
+      if (bytes.subarray(0, 6).toString('ascii') !== 'GIF89a' ||
+          createHash('sha256').update(bytes).digest('hex') !== reviewedBinary.get(rel)) {
+        findings.push('Binary differs from reviewed asset: ' + rel);
+      }
+      continue;
+    }
     const text = fs.readFileSync(file, 'utf8');
     if (/sk-(?:or-v1-)?[A-Za-z0-9_-]{20,}|gh[pousr]_[A-Za-z0-9]{25,}|-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/.test(text)) findings.push('Possible secret: ' + rel);
     if (/\/(?:Users|home)\/(?!example(?:\/|\b))[^\s"'<>]+/.test(text)) findings.push('Private home path: ' + rel);
